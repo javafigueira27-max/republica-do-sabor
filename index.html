@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="pt" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>República do Sabor - Churrascaria Premium | Kilamba, Luanda</title>
+  <meta name="description" content="República do Sabor - Onde a tradição angolana encontra o verdadeiro sabor. Gastronomia autêntica no Kilamba (Feira do F), Luanda. Encomendas via WhatsApp com entregas exclusivas no Kilamba e KK." />
+
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- React & ReactDOM CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+
+  <!-- Babel Standalone for JSX parsing -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brandRed: '#E52421',
+            brandRedDark: '#B71C1C',
+            brandYellow: '#FBC02D',
+            brandYellowDark: '#D4A017',
+            brandBlack: '#0A0A0A',
+            brandCard: '#141414',
+            brandNav: '#050505',
+          },
+          fontFamily: {
+            heading: ['Outfit', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Samakaka Custom SVG Pattern & Scrollbar */
+    body {
+      background-color: #0A0A0A;
+      color: #FFFFFF;
+      font-family: 'Inter', sans-serif;
+    }
+
+    h1, h2, h3, h4, h5, h6, .font-heading {
+      font-family: 'Outfit', sans-serif;
+    }
+
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0d0d0d;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #E52421;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #FBC02D;
+    }
+
+    .samakaka-band {
+      background: linear-gradient(90deg, 
+        #E52421 0%, #E52421 25%, 
+        #FBC02D 25%, #FBC02D 50%, 
+        #000000 50%, #000000 75%, 
+        #FFFFFF 75%, #FFFFFF 100%
+      );
+      background-size: 32px 100%;
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-red-600 selection:text-white">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, createContext, useContext } = React;
+
+    const WHATSAPP_NUMBER = '244927821505';
+    const DISPLAY_WHATSAPP = '927 821 505';
+
+    // INITIAL MENU DATA ACROSS THE 5 CATEGORIES
+    const INITIAL_CATEGORIES = [
+      { id: 'pratos-arroz', name: 'Pratos de Arroz' },
+      { id: 'pratos-funge', name: 'Pratos de Funge' },
+      { id: 'acompanhamentos', name: 'Acompanhamentos' },
+      { id: 'sobremesas', name: 'Sobremesas' },
+      { id: 'bebidas', name: 'Bebidas (Sem Álcool)' }
+    ];
+
+    const INITIAL_DISHES = [
+      // PRATOS DE ARROZ
+      { id: 'arroz-1', categoryId: 'pratos-arroz', name: 'Caril de Frango Tradicional', description: 'Frango tenro cozinhado num rico molho de caril aromático, especiarias e leite de coco, acompanhado com arroz soltinho.', price: 5500, image: 'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?auto=format&fit=crop&w=800&q=80', highlight: true, badge: 'Mais Pedido' },
+      { id: 'arroz-2', categoryId: 'pratos-arroz', name: 'Feijão e Peixe Frito', description: 'Peixe fresco temperado à angolana, frito ao ponto estaladiço, servido com feijão cremoso e arroz de manteiga.', price: 6800, image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=800&q=80', highlight: false },
+      { id: 'arroz-3', categoryId: 'pratos-arroz', name: 'Estrogonofe de Frango', description: 'Tiras de frango suculentas envolvidas em molho aveludado com cogumelos frescos, servido com arroz branco e batata palha.', price: 5800, image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80', highlight: false },
+      { id: 'arroz-4', categoryId: 'pratos-arroz', name: 'Patanisca de Peixe com Arroz', description: 'Pataniscas estaladiças de peixe selecionado com ervas aromáticas, acompanhadas de arroz de tomate caseiro.', price: 4900, image: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=800&q=80', highlight: false },
+      { id: 'arroz-5', categoryId: 'pratos-arroz', name: 'Frango, Batatas e Salada', description: 'Frango suculento assado na grelha, batatas douradas estaladiças e salada fresca de alface, tomate e cebola.', price: 6200, image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80', highlight: false },
+      { id: 'arroz-6', categoryId: 'pratos-arroz', name: 'Combinado da Grelha (Bife, Bifana, Entremeadas & Febras)', description: 'Seleção especial da nossa churrascaria: bife suculento, bifana temperada, entremeadas douradas e febras tenras com arroz.', price: 9500, image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80', highlight: true, badge: 'Especialidade' },
+      { id: 'arroz-7', categoryId: 'pratos-arroz', name: 'Churrasco com Feijão Preto', description: 'Carne de churrasco assada no carvão ao estilo da República, acompanhada por feijão preto guisado e arroz soltinho.', price: 7200, image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80', highlight: true },
+      { id: 'arroz-8', categoryId: 'pratos-arroz', name: 'Caldeirada de Cabrito', description: 'Carne de cabrito tenra guisada vagarosamente num rico estufado de tomate, pimentos e especiarias com arroz.', price: 8900, image: 'https://images.unsplash.com/photo-1547496502-affa22d38842?auto=format&fit=crop&w=800&q=80', highlight: false },
+      { id: 'arroz-9', categoryId: 'pratos-arroz', name: 'Guisada de Frango Caseira', description: 'Frango estufado tradicional angolano com legumes da horta, molho espesso e arroz temperado.', price: 5200, image: 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=800&q=80', highlight: false },
+      { id: 'arroz-10', categoryId: 'pratos-arroz', name: 'Batatas Coradas no Forno com Pato', description: 'Pato assado ao forno até à pele dourada e crocante, servido com batatas coradas no sumo da carne e arroz aromatizado.', price: 10500, image: 'https://images.unsplash.com/photo-1514944298341-9880e65a852e?auto=format&fit=crop&w=800&q=80', highlight: true, badge: 'Chef Choice' },
+
+      // PRATOS DE FUNGE
+      { id: 'funge-1', categoryId: 'pratos-funge', name: 'Muamba de Galinha', description: 'O ex-libris da gastronomia angolana: galinha rasteira estufada num rico molho de óleo de palma, quiabos, gindungo e funge de milho ou bombó.', price: 7800, image: 'https://images.unsplash.com/photo-1574484284002-952d92456975?auto=format&fit=crop&w=800&q=80', highlight: true, badge: 'Tradição Angolana' },
+      { id: 'funge-2', categoryId: 'pratos-funge', name: 'Calulu de Peixe Fresco', description: 'Peixe fresco da nossa costa com rama de mandioca, quiabos e óleo de palma puríssimo, servido com funge quente.', price: 8200, image: 'https://images.unsplash.com/photo-1534604973900-c43ab4c2e0ab?auto=format&fit=crop&w=800&q=80', highlight: true },
+      { id: 'funge-3', categoryId: 'pratos-funge', name: 'Calulu de Carne Seca', description: 'Autêntico calulu angolano preparado com carne seca desfiada, rama tradicional, quiabos e funge macio.', price: 8500, image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=800&q=80', highlight: false },
+      { id: 'funge-4', categoryId: 'pratos-funge', name: 'Carne Seca com Muteta', description: 'Carne seca salteada e apurada com molho tradicional de muteta e quiabos, servida com funge quente de milho.', price: 8900, image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80', highlight: false },
+      { id: 'funge-5', categoryId: 'pratos-funge', name: 'Peixe Grelhado com Funge', description: 'Peixe inteiro grelhado no carvão com brasa forte, temperado com alho e limão, servido com funge e molho vilão.', price: 7500, image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=800&q=80', highlight: false },
+      { id: 'funge-6', categoryId: 'pratos-funge', name: 'Febras com Funge e Feijão de Óleo de Palma', description: 'Febras de porco tenras grelhadas na hora, servidas com funge quentinho e molho de feijão temperado.', price: 6500, image: 'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?auto=format&fit=crop&w=800&q=80', highlight: false },
+      { id: 'funge-7', categoryId: 'pratos-funge', name: 'Entrecosto Assado com Funge', description: 'Entrecosto de porco marinado e assado lentamente, com pele crocante, molho de estufado e funge.', price: 7900, image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80', highlight: false },
+      { id: 'funge-8', categoryId: 'pratos-funge', name: 'Picanha Nobre com Funge & Feijão', description: 'Fatias nobres de picanha grelhada com flor de sal, acompanhadas de funge de bombó e feijão especial.', price: 11000, image: 'https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=800&q=80', highlight: true, badge: 'Premium' },
+      { id: 'funge-9', categoryId: 'pratos-funge', name: 'Bagre Fumado com Molho Tradicional', description: 'Bagre artesanalmente fumado, cozinhado num estufado rico de tomate e quiabo com funge macio.', price: 8800, image: 'https://images.unsplash.com/photo-1534604973900-c43ab4c2e0ab?auto=format&fit=crop&w=800&q=80', highlight: false },
+      { id: 'funge-10', categoryId: 'pratos-funge', name: 'Bagre Escalado Grelhado', description: 'Bagre fresco aberto e escalado, temperado e grelhado nas brasas, servido com funge de milho e gindungo.', price: 8400, image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=800&q=80', highlight: false },
+      { id: 'funge-11', categoryId: 'pratos-funge', name: 'Ovo e Chouriço com Funge', description: 'Refeição rápida e reconfortante: chouriço caseiro frito no próprio molho com ovos e funge quentinho.', price: 4800, image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=800&q=80', highlight: false },
+
+      // ACOMPANHAMENTOS
+      { id: 'acomp-1', categoryId: 'acompanhamentos', name: 'Batata Doce Frita', description: 'Rodelas estaladiças de batata doce nacional frita na hora.', price: 1800, image: 'https://images.unsplash.com/photo-1576107232684-1279f3908594?auto=format&fit=crop&w=800&q=80', highlight: false },
+      { id: 'acomp-2', categoryId: 'acompanhamentos', name: 'Batata Rena Frita', description: 'Batatas palito estaladiças por fora e macias por dentro.', price: 1500, image: 'https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?auto=format&fit=crop&w=800&q=80', highlight: false },
+      { id: 'acomp-3', categoryId: 'acompanhamentos', name: 'Feijão Preto Guisado', description: 'Feijão preto bem temperado com alho, louro e azeite.', price: 1600, image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80', highlight: false },
+      { id: 'acomp-4', categoryId: 'acompanhamentos', name: 'Mandioca Cozida', description: 'Mandioca tenra e macia cozida no ponto certo.', price: 1400, image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=800&q=80', highlight: false },
+      { id: 'acomp-5', categoryId: 'acompanhamentos', name: 'Banana Pão Cozida', description: 'Banana pão regional cozida no vapor, acompanhamento tradicional.', price: 1500, image: 'https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&w=800&q=80', highlight: false },
+      { id: 'acomp-6', categoryId: 'acompanhamentos', name: 'Banana Pão Frita', description: 'Fatias de banana pão fritas até ficarem douradas e doces.', price: 1700, image: 'https://images.unsplash.com/photo-1603833665858-e61d17a86224?auto=format&fit=crop&w=800&q=80', highlight: true },
+
+      // SOBREMESAS
+      { id: 'sob-1', categoryId: 'sobremesas', name: 'Bolo de Canela e Coco', description: 'Bolo fofo artesanal com aroma a canela e lascas de coco ralado fresco.', price: 2000, image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=800&q=80', highlight: true, badge: 'Mais Pedido' },
+      { id: 'sob-2', categoryId: 'sobremesas', name: 'Bolo de Maçã Caseiro', description: 'Fatia generosa de bolo de maçã fofinho com raspas de limão e canela.', price: 1900, image: 'https://images.unsplash.com/photo-1568571780765-9276ac8b75a2?auto=format&fit=crop&w=800&q=80', highlight: false },
+      { id: 'sob-3', categoryId: 'sobremesas', name: 'Bolo de Laranja Húmido', description: 'Bolo húmido impregnado de calda natural de laranja fresca.', price: 1900, image: 'https://images.unsplash.com/photo-1582293041079-7814c2f12063?auto=format&fit=crop&w=800&q=80', highlight: false },
+      { id: 'sob-4', categoryId: 'sobremesas', name: 'Pudim de Ovos de Leite Condensado', description: 'Pudim caseiro cremoso com calda de caramelo dourado.', price: 2200, image: 'https://images.unsplash.com/photo-1528975604071-b4dc52a2d18c?auto=format&fit=crop&w=800&q=80', highlight: true },
+      { id: 'sob-5', categoryId: 'sobremesas', name: 'Mousse de Fruta da Época', description: 'Mousse aveludada preparada com polpa fresca de fruta angolana (Manga, Maracujá ou Mungua).', price: 2300, image: 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80', highlight: false },
+
+      // BEBIDAS (100% SEM ÁLCOOL)
+      { id: 'beb-1', categoryId: 'bebidas', name: 'Kissangua Tradicional Angolana', description: 'Bebida artesanal angolana refrescante à base de milho fermentado de forma natural e suave. 100% Sem Álcool.', price: 1200, image: 'https://images.unsplash.com/photo-1546171753-97d7676e4602?auto=format&fit=crop&w=800&q=80', highlight: true, badge: '100% Tradicional' },
+      { id: 'beb-2', categoryId: 'bebidas', name: 'Sumo Natural da Época (500ml)', description: 'Sumo natural feito na hora: Maracujá, Manga, Laranja ou Limonada com Gengibre. Sem açúcares adicionados.', price: 1500, image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=800&q=80', highlight: true },
+      { id: 'beb-3', categoryId: 'bebidas', name: 'Refrigerantes Diversos (Lata)', description: 'Coca-Cola, Fanta Laranja, Sprite ou Vitalíze bem gelados.', price: 1000, image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=800&q=80', highlight: false },
+      { id: 'beb-4', categoryId: 'bebidas', name: 'Chá Quente ou Gelado da Casa', description: 'Infusão aromática de Capim-Santo (Caxinde) ou Hibisco (Cacuso) gelado com pedras de gelo.', price: 1100, image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=800&q=80', highlight: false }
+    ];
+
+    // SAMAKAKA EMBLEM & BAND COMPONENTS
+    const SamakakaBand = ({ height = 12 }) => (
+      <div className="w-full samakaka-band overflow-hidden select-none" style={{ height: `${height}px` }} />
+    );
+
+    const SamakakaLogo = ({ size = 44 }) => (
+      <div className="relative inline-flex items-center justify-center shrink-0" style={{ width: size, height: size }}>
+        <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-[0_4px_12px_rgba(229,36,33,0.5)]">
+          <polygon points="50,2 98,50 50,98 2,50" fill="#E52421" stroke="#FBC02D" strokeWidth="4" />
+          <polygon points="50,15 85,50 50,85 15,50" fill="#000000" />
+          <polygon points="50,26 74,50 50,74 26,50" fill="#FBC02D" />
+          <polygon points="50,38 62,50 50,62 38,50" fill="#FFFFFF" />
+          <polygon points="50,44 56,50 50,56 44,50" fill="#E52421" />
+        </svg>
+      </div>
+    );
+
+    const SamakakaDivider = ({ title, subtitle }) => (
+      <div className="py-8 my-2 text-center relative">
+        <div className="flex items-center justify-center space-x-4 mb-3">
+          <div className="h-1 flex-1 max-w-xs bg-gradient-to-r from-transparent via-[#E52421] to-[#FBC02D]" />
+          <div className="w-8 h-8 bg-black border-2 border-[#FBC02D] rotate-45 flex items-center justify-center shadow-lg">
+            <div className="w-4 h-4 bg-[#E52421] flex items-center justify-center">
+              <div className="w-1.5 h-1.5 bg-white" />
+            </div>
+          </div>
+          <div className="h-1 flex-1 max-w-xs bg-gradient-to-l from-transparent via-[#E52421] to-[#FBC02D]" />
+        </div>
+        {title && <h2 className="text-3xl md:text-5xl font-black uppercase tracking-wider text-white font-heading">{title}</h2>}
+        {subtitle && <p className="text-gray-400 max-w-xl mx-auto mt-2 text-sm md:text-base">{subtitle}</p>}
+      </div>
+    );
+
+    // MAIN APPLICATION COMPONENT
+    function App() {
+      // Menu State
+      const [dishes, setDishes] = useState(() => {
+        const saved = localStorage.getItem('republica_dishes');
+        return saved ? JSON.parse(saved) : INITIAL_DISHES;
+      });
+      const [categories, setCategories] = useState(() => {
+        const saved = localStorage.getItem('republica_categories');
+        return saved ? JSON.parse(saved) : INITIAL_CATEGORIES;
+      });
+      const [selectedCat, setSelectedCat] = useState('todos');
+      const [searchQuery, setSearchQuery] = useState('');
+
+      // Cart & Customization State
+      const [cartItems, setCartItems] = useState([]);
+      const [isCartOpen, setIsCartOpen] = useState(false);
+      const [customizingDish, setCustomizingDish] = useState(null);
+      const [customerInfo, setCustomerInfo] = useState({ name: '', phone: '', address: '', notes: '' });
+
+      // Admin State
+      const [isAdminOpen, setIsAdminOpen] = useState(false);
+      const [isAdminAuth, setIsAdminAuth] = useState(false);
+      const [adminUser, setAdminUser] = useState('');
+      const [adminPass, setAdminPass] = useState('');
+      const [adminError, setAdminError] = useState('');
+      const [editingDishId, setEditingDishId] = useState(null);
+      const [dishForm, setDishForm] = useState({ name: '', description: '', price: '', categoryId: 'pratos-arroz', image: '', highlight: false, badge: '' });
+
+      // Reviews State
+      const [reviews, setReviews] = useState([
+        { id: 1, name: 'Sebastião Manuel', location: 'Kilamba, Bloco B', rating: 5, date: 'Há 2 dias', comment: 'A melhor Muamba de Galinha do Kilamba! Atendimento super rápido e a entrega chegou quentinha no meu apartamento.' },
+        { id: 2, name: 'Eugénia da Conceição', location: 'KK 5000', rating: 5, date: 'Há 5 dias', comment: 'O churrasco é divinal e a Kissangua é autêntica como a da minha avó. O website está bonito e organizado com a Samakaka!' },
+        { id: 3, name: 'Dr. António Neto', location: 'Kilamba, Bloco F', rating: 5, date: 'Há 1 semana', comment: 'Recomendo vivamente a Caldeirada de Cabrito e a Picanha. Qualidade impecável e o sistema de encomenda pelo WhatsApp funciona perfeito.' }
+      ]);
+      const [newReview, setNewReview] = useState({ name: '', location: '', rating: 5, comment: '' });
+      const [showReviewForm, setShowReviewForm] = useState(false);
+
+      useEffect(() => {
+        localStorage.setItem('republica_dishes', JSON.stringify(dishes));
+      }, [dishes]);
+
+      useEffect(() => {
+        lucide.createIcons();
+      });
+
+      // Cart Actions
+      const addToCart = (dish, customization = null) => {
+        const cartItemId = `${dish.id}-${Date.now()}`;
+        const extrasTotal = customization?.extras?.reduce((sum, e) => sum + e.price, 0) || 0;
+        const unitPrice = dish.price + extrasTotal;
+
+        setCartItems(prev => [...prev, {
+          cartItemId,
+          name: dish.name,
+          unitPrice,
+          quantity: 1,
+          image: dish.image,
+          customization
+        }]);
+        setIsCartOpen(true);
+      };
+
+      const updateQty = (id, delta) => {
+        setCartItems(prev => prev.map(item => {
+          if (item.cartItemId === id) {
+            const q = item.quantity + delta;
+            return q > 0 ? { ...item, quantity: q } : null;
+          }
+          return item;
+        }).filter(Boolean));
+      };
+
+      const cartSubtotal = cartItems.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+      const totalItemsCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+      const checkoutWhatsApp = () => {
+        if (!customerInfo.name || !customerInfo.phone || !customerInfo.address) {
+          alert('Por favor preencha o seu Nome, Telefone e Endereço no Kilamba ou KK.');
+          return;
+        }
+
+        let msg = `*--- NOVO PEDIDO - REPÚBLICA DO SABOR ---*\n\n`;
+        msg += `👤 *Nome:* ${customerInfo.name}\n`;
+        msg += `📲 *Telefone:* ${customerInfo.phone}\n`;
+        msg += `📍 *Endereço (Kilamba/KK):* ${customerInfo.address}\n`;
+        if (customerInfo.notes) msg += `📝 *Obs. Geral:* ${customerInfo.notes}\n`;
+
+        msg += `\n*📋 ITENS DO PEDIDO:*\n`;
+        cartItems.forEach((item, idx) => {
+          msg += `\n*${idx + 1}. ${item.name}* (x${item.quantity})\n`;
+          msg += `   Valor un.: ${item.unitPrice.toLocaleString('pt-AO')} Kz\n`;
+          if (item.customization) {
+            if (item.customization.removed?.length) msg += `   🚫 *Remover:* ${item.customization.removed.join(', ')}\n`;
+            if (item.customization.extras?.length) msg += `   ➕ *Extras:* ${item.customization.extras.map(e => e.name).join(', ')}\n`;
+            if (item.customization.sideSwap && item.customization.sideSwap !== 'Manter Padrão') msg += `   🔄 *Acompanhamento:* ${item.customization.sideSwap}\n`;
+            if (item.customization.notes) msg += `   💬 *Obs:* ${item.customization.notes}\n`;
+          }
+          msg += `   Subtotal: ${(item.unitPrice * item.quantity).toLocaleString('pt-AO')} Kz\n`;
+        });
+
+        msg += `\n--------------------------------\n`;
+        msg += `💰 *TOTAL DA ENCOMENDA: ${cartSubtotal.toLocaleString('pt-AO')} Kz*\n`;
+        msg += `🚚 *Entrega:* Exclusiva no Kilamba e KK\n`;
+        msg += `--------------------------------\n`;
+        msg += `*Obrigado por escolher a República do Sabor!* 🇦🇴`;
+
+        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+      };
+
+      // Admin Handlers
+      const handleAdminLogin = (e) => {
+        e.preventDefault();
+        if (adminUser === 'admin' && adminPass === 'sabor2026') {
+          setIsAdminAuth(true);
+          setAdminError('');
+        } else {
+          setAdminError('Credenciais incorretas (admin / sabor2026)');
+        }
+      };
+
+      const handleSaveDish = (e) => {
+        e.preventDefault();
+        if (!dishForm.name || !dishForm.price || !dishForm.image) return;
+
+        if (editingDishId) {
+          setDishes(prev => prev.map(d => d.id === editingDishId ? { ...dishForm, id: d.id, price: Number(dishForm.price) } : d));
+          setEditingDishId(null);
+        } else {
+          setDishes(prev => [{ ...dishForm, id: `dish-${Date.now()}`, price: Number(dishForm.price) }, ...prev]);
+        }
+        setDishForm({ name: '', description: '', price: '', categoryId: 'pratos-arroz', image: '', highlight: false, badge: '' });
+        alert('Menu atualizado com sucesso!');
+      };
+
+      const filteredDishes = dishes.filter(d => {
+        const matchCat = selectedCat === 'todos' || d.categoryId === selectedCat;
+        const matchSearch = d.name.toLowerCase().includes(searchQuery.toLowerCase()) || d.description.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchCat && matchSearch;
+      });
+
+      return (
+        <div className="min-h-screen bg-black text-white flex flex-col font-sans">
+          {/* TOP SAMAKAKA BAND */}
+          <SamakakaBand height={8} />
+
+          {/* INSTITUTIONAL HEADER & ANNOUNCEMENT */}
+          <div className="bg-[#111] text-xs py-1.5 border-b border-[#222]">
+            <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center text-gray-300 gap-1">
+              <div className="flex items-center space-x-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="font-bold text-[#FBC02D]">ENTREGAS EXCLUSIVAS:</span>
+                <span>Cidade do Kilamba & Centralidade KK 5000</span>
+              </div>
+              <div className="flex items-center space-x-4 font-semibold">
+                <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" className="hover:text-[#FBC02D] flex items-center space-x-1">
+                  <i data-lucide="phone" className="w-3 h-3 text-[#E52421]"></i>
+                  <span>WhatsApp: {DISPLAY_WHATSAPP}</span>
+                </a>
+                <span>|</span>
+                <span className="text-gray-400">📍 Kilamba – Feira do F</span>
+              </div>
+            </div>
+          </div>
+
+          {/* NAVBAR */}
+          <header className="sticky top-0 z-40 bg-[#070707]/95 backdrop-blur-md border-b border-[#222] py-3">
+            <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
+              <a href="#inicio" className="flex items-center space-x-3">
+                <SamakakaLogo size={42} />
+                <div>
+                  <span className="text-xl md:text-2xl font-black uppercase tracking-wider font-heading block leading-none">
+                    República <span className="text-[#E52421]">do Sabor</span>
+                  </span>
+                  <span className="text-[10px] uppercase text-[#FBC02D] font-bold tracking-widest block">
+                    Churrascaria & Gastronomia Angolana
+                  </span>
+                </div>
+              </a>
+
+              <nav className="hidden md:flex items-center space-x-8 text-sm font-bold">
+                <a href="#inicio" className="hover:text-[#FBC02D] transition-colors">Início</a>
+                <a href="#menu" className="hover:text-[#FBC02D] transition-colors">Menu</a>
+                <a href="#galeria" className="hover:text-[#FBC02D] transition-colors">Galeria</a>
+                <a href="#avaliacoes" className="hover:text-[#FBC02D] transition-colors">Avaliações</a>
+                <a href="#contactos" className="hover:text-[#FBC02D] transition-colors">Contactos</a>
+              </nav>
+
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => setIsAdminOpen(true)}
+                  className="hidden sm:flex items-center space-x-1 px-3 py-1.5 text-xs font-bold bg-[#1a1a1a] hover:bg-[#252525] border border-gray-800 text-gray-300 rounded-lg"
+                >
+                  <i data-lucide="lock" className="w-3.5 h-3.5 text-[#E52421]"></i>
+                  <span>Painel Admin</span>
+                </button>
+
+                <button
+                  onClick={() => setIsCartOpen(true)}
+                  className="relative flex items-center space-x-2 px-4 py-2 bg-[#E52421] hover:bg-[#c62828] text-white rounded-lg font-extrabold text-sm shadow-md border-b-2 border-[#FBC02D]"
+                >
+                  <i data-lucide="shopping-bag" className="w-4 h-4"></i>
+                  <span>Encomenda</span>
+                  {totalItemsCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-[#FBC02D] text-black font-black text-xs w-5 h-5 rounded-full flex items-center justify-center shadow animate-bounce">
+                      {totalItemsCount}
+                    </span>
+                  )}
+                </button>
+              </div>
+            </div>
+          </header>
+
+          {/* HERO BANNER */}
+          <section id="inicio" className="relative py-16 md:py-24 bg-black overflow-hidden flex items-center justify-center">
+            <div className="absolute inset-0 z-0 opacity-30 bg-cover bg-center" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1920&q=80')` }}></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent"></div>
+
+            <div className="max-w-4xl mx-auto px-4 relative z-10 text-center">
+              <div className="inline-flex items-center space-x-2 px-4 py-1 rounded-full bg-[#121212] border border-[#FBC02D]/40 text-[#FBC02D] text-xs font-bold tracking-wider uppercase mb-4">
+                <span>🇦🇴 Churrascaria Tradicional • Kilamba Feira do F</span>
+              </div>
+
+              <h1 className="text-4xl sm:text-6xl md:text-7xl font-black uppercase tracking-tight text-white font-heading leading-tight">
+                República <span className="text-[#E52421]">do Sabor</span>
+              </h1>
+
+              <p className="mt-4 text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-100 font-heading italic">
+                “Onde a tradição angolana encontra o verdadeiro sabor.”
+              </p>
+
+              <p className="mt-3 text-gray-300 text-sm md:text-base max-w-2xl mx-auto">
+                Grelhados artesanais no carvão, Muamba de Galinha, Calulu, Peixe Fresco e acompanhamentos genuínos.
+              </p>
+
+              <div className="mt-5 inline-block bg-[#E52421]/20 border border-[#E52421]/60 px-4 py-1.5 rounded-lg text-xs font-bold text-red-200">
+                🚚 Entregamos apenas no Kilamba e KK
+              </div>
+
+              <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="#menu" className="w-full sm:w-auto px-8 py-3.5 bg-[#FBC02D] hover:bg-[#d4a017] text-black font-black text-sm uppercase tracking-wider rounded-xl shadow-lg border-b-4 border-amber-600">
+                  Ver Menu
+                </a>
+                <button onClick={() => setIsCartOpen(true)} className="w-full sm:w-auto px-8 py-3.5 bg-[#E52421] hover:bg-[#c62828] text-white font-black text-sm uppercase tracking-wider rounded-xl shadow-lg border-b-4 border-red-950">
+                  Fazer Encomenda
+                </button>
+                <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" className="w-full sm:w-auto px-8 py-3.5 bg-[#128C7E] hover:bg-[#075E54] text-white font-black text-sm uppercase tracking-wider rounded-xl shadow-lg border-b-4 border-emerald-950">
+                  Contactar WhatsApp
+                </a>
+              </div>
+            </div>
+          </section>
+
+          {/* MENU SECTION */}
+          <section id="menu" className="py-16 bg-[#0a0a0a]">
+            <div className="max-w-7xl mx-auto px-4">
+              <SamakakaDivider title="O Nosso Menu" subtitle="Pratos tradicionais angolanos, churrasco suculento e sobremesas deliciosas." />
+
+              {/* Categories Navigation */}
+              <div className="mt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="flex items-center space-x-2 overflow-x-auto w-full pb-2 md:pb-0">
+                  <button
+                    onClick={() => setSelectedCat('todos')}
+                    className={`px-4 py-2 rounded-xl text-xs font-extrabold uppercase whitespace-nowrap ${selectedCat === 'todos' ? 'bg-[#E52421] text-white' : 'bg-[#141414] text-gray-400 border border-gray-800'}`}
+                  >
+                    Todos os Pratos
+                  </button>
+                  {categories.map(c => (
+                    <button
+                      key={c.id}
+                      onClick={() => setSelectedCat(c.id)}
+                      className={`px-4 py-2 rounded-xl text-xs font-extrabold uppercase whitespace-nowrap ${selectedCat === c.id ? 'bg-[#E52421] text-white' : 'bg-[#141414] text-gray-400 border border-gray-800'}`}
+                    >
+                      {c.name}
+                    </button>
+                  ))}
+                </div>
+
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  placeholder="Pesquisar no menu..."
+                  className="w-full md:w-64 bg-[#141414] border border-gray-800 rounded-xl px-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-[#FBC02D]"
+                />
+              </div>
+
+              {selectedCat === 'bebidas' && (
+                <div className="mt-4 p-3 bg-emerald-950/40 border border-emerald-500/40 rounded-xl text-xs text-emerald-300 font-bold">
+                  🛡️ Garantia República do Sabor: Todas as bebidas são 100% livres de álcool (Kissangua, Sumos Naturais, Refrigerantes, Chás).
+                </div>
+              )}
+
+              {/* Dishes Grid */}
+              <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredDishes.map(dish => (
+                  <div key={dish.id} className="bg-[#121212] border border-gray-800 rounded-2xl overflow-hidden flex flex-col justify-between hover:border-[#FBC02D] transition-all">
+                    <div>
+                      <div className="relative h-48 w-full bg-gray-900">
+                        <img src={dish.image} alt={dish.name} className="w-full h-full object-cover" />
+                        {dish.badge && (
+                          <span className="absolute top-2 left-2 bg-[#E52421] text-white text-[10px] font-black px-2 py-0.5 rounded shadow">
+                            {dish.badge}
+                          </span>
+                        )}
+                      </div>
+                      <div className="p-4">
+                        <h3 className="text-base font-bold text-white font-heading">{dish.name}</h3>
+                        <p className="text-xs text-gray-400 mt-1 line-clamp-2">{dish.description}</p>
+                      </div>
+                    </div>
+
+                    <div className="p-4 pt-0">
+                      <div className="flex items-center justify-between border-t border-gray-800 pt-3 mb-3">
+                        <span className="text-xs text-gray-400">Preço</span>
+                        <span className="text-lg font-black text-[#FBC02D] font-heading">{dish.price.toLocaleString('pt-AO')} Kz</span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          onClick={() => setCustomizingDish(dish)}
+                          className="py-2 bg-[#1a1a1a] hover:bg-[#252525] text-gray-300 rounded-xl text-xs font-bold border border-gray-800"
+                        >
+                          Opções
+                        </button>
+                        <button
+                          onClick={() => addToCart(dish)}
+                          className="py-2 bg-[#E52421] hover:bg-[#c62828] text-white font-extrabold uppercase text-xs rounded-xl border-b-2 border-red-950"
+                        >
+                          Encomendar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* GALERIA FOTOGRÁFICA */}
+          <section id="galeria" className="py-16 bg-[#060606]">
+            <div className="max-w-7xl mx-auto px-4">
+              <SamakakaDivider title="Galeria Real" subtitle="Fotografias autênticas e profissionais dos nossos pratos no Kilamba." />
+              <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {[
+                  { title: 'Churrasco no Carvão', image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80' },
+                  { title: 'Muamba de Galinha', image: 'https://images.unsplash.com/photo-1574484284002-952d92456975?auto=format&fit=crop&w=800&q=80' },
+                  { title: 'Combinado da Grelha', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80' },
+                  { title: 'Peixe Fresco Grelhado', image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=800&q=80' },
+                  { title: 'Kissangua Tradicional', image: 'https://images.unsplash.com/photo-1546171753-97d7676e4602?auto=format&fit=crop&w=800&q=80' },
+                  { title: 'Bolo de Canela e Coco', image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=800&q=80' }
+                ].map((item, idx) => (
+                  <div key={idx} className="relative h-64 rounded-2xl overflow-hidden border border-gray-800 group">
+                    <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
+                    <div className="absolute bottom-4 left-4 z-10">
+                      <span className="text-[10px] bg-[#E52421] text-white px-2 py-0.5 rounded font-black uppercase">Kilamba</span>
+                      <h4 className="text-base font-bold text-white font-heading mt-1">{item.title}</h4>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* AVALIAÇÕES */}
+          <section id="avaliacoes" className="py-16 bg-[#0a0a0a]">
+            <div className="max-w-7xl mx-auto px-4">
+              <SamakakaDivider title="Avaliações de Clientes" subtitle="O orgulho da nossa casa é a satisfação da comunidade." />
+              <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                {reviews.map(r => (
+                  <div key={r.id} className="bg-[#121212] border border-gray-800 rounded-2xl p-6 flex flex-col justify-between">
+                    <div>
+                      <div className="flex text-[#FBC02D] mb-3">{'★'.repeat(r.rating)}</div>
+                      <p className="text-gray-300 text-xs italic">"{r.comment}"</p>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-gray-800 flex justify-between text-xs">
+                      <div>
+                        <span className="font-bold text-white block">{r.name}</span>
+                        <span className="text-[#FBC02D] text-[11px]">{r.location}</span>
+                      </div>
+                      <span className="text-gray-500 text-[10px]">{r.date}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* CONTACTOS & MAPA */}
+          <section id="contactos" className="py-16 bg-[#050505]">
+            <div className="max-w-7xl mx-auto px-4">
+              <SamakakaDivider title="Contactos & Localização" subtitle="Kilamba – Feira do F – Luanda" />
+              <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="bg-[#121212] border border-gray-800 rounded-2xl p-6 space-y-4">
+                  <h3 className="text-xl font-bold text-white font-heading">República do Sabor</h3>
+                  <p className="text-xs text-gray-400">📍 Kilamba – Feira do F – Luanda, Angola</p>
+                  <p className="text-xs text-[#FBC02D] font-bold">📲 WhatsApp Encomendas: {DISPLAY_WHATSAPP}</p>
+                  <p className="text-xs text-gray-400">Horário: Segunda a Domingo (11h00 às 22h00)</p>
+                  <div className="pt-2 flex gap-3 text-xs">
+                    <span className="px-3 py-1 bg-[#1a1a1a] border border-gray-800 rounded-lg text-gray-300">Facebook: República do Sabor</span>
+                    <span className="px-3 py-1 bg-[#1a1a1a] border border-gray-800 rounded-lg text-gray-300">Instagram: República do Sabor</span>
+                  </div>
+                </div>
+
+                <div className="bg-[#121212] border border-gray-800 rounded-2xl p-6 flex flex-col justify-center items-center text-center">
+                  <div className="w-12 h-12 rounded-full bg-[#E52421] border-2 border-[#FBC02D] flex items-center justify-center text-white font-bold mb-2">📍</div>
+                  <h4 className="text-lg font-bold text-white font-heading">Localização na Feira do F</h4>
+                  <p className="text-xs text-gray-400 max-w-xs mt-1">Próximo dos blocos principais da Centralidade do Kilamba com entregas rápidas no Kilamba e KK 5000.</p>
+                  <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" className="mt-4 px-6 py-2.5 bg-[#128C7E] text-white font-bold text-xs rounded-xl">Pedir Localização GPS no WhatsApp</a>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* FOOTER */}
+          <footer className="bg-[#030303] text-gray-400 text-xs border-t border-gray-900">
+            <div className="bg-[#141414] py-8 text-center px-4 border-b border-gray-800">
+              <blockquote className="text-base sm:text-lg font-extrabold text-white font-heading italic">
+                “Assim, quer vocês comam, bebam ou façam qualquer outra coisa, façam tudo para a glória de Deus.”
+              </blockquote>
+              <cite className="block mt-1 text-xs font-bold text-[#FBC02D] uppercase not-italic">— 1 Coríntios 10:31</cite>
+            </div>
+
+            <div className="max-w-7xl mx-auto px-4 py-8 text-center">
+              <p>© {new Date().getFullYear()} República do Sabor. Todos os direitos reservados. Kilamba, Luanda - Angola 🇦🇴</p>
+            </div>
+            <SamakakaBand height={10} />
+          </footer>
+
+          {/* DISH CUSTOMIZER MODAL */}
+          {customizingDish && (
+            <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="bg-[#121212] border border-gray-800 rounded-2xl max-w-md w-full p-6 space-y-4">
+                <h3 className="text-lg font-bold text-white font-heading">Personalizar {customizingDish.name}</h3>
+                <p className="text-xs text-gray-400">Escolha as suas preferências antes de encomendar:</p>
+
+                <div className="space-y-3 text-xs">
+                  <div>
+                    <label className="font-bold text-gray-300 block mb-1">Trocar Acompanhamento:</label>
+                    <select id="cust-side" className="w-full bg-[#1a1a1a] border border-gray-800 rounded-lg p-2 text-white">
+                      <option value="Manter Padrão">Manter Acompanhamento Padrão</option>
+                      <option value="Batata Doce Frita">Batata Doce Frita</option>
+                      <option value="Mandioca Cozida">Mandioca Cozida</option>
+                      <option value="Banana Pão Frita">Banana Pão Frita</option>
+                      <option value="Banana Pão Cozida">Banana Pão Cozida</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-gray-300 block mb-1">Observações para a Cozinha:</label>
+                    <textarea id="cust-notes" placeholder="Ex: Sem cebola, molho à parte..." className="w-full bg-[#1a1a1a] border border-gray-800 rounded-lg p-2 text-white" rows="2"></textarea>
+                  </div>
+                </div>
+
+                <div className="flex justify-end space-x-2 pt-2">
+                  <button onClick={() => setCustomizingDish(null)} className="px-4 py-2 bg-gray-800 text-gray-300 text-xs rounded-lg font-bold">Cancelar</button>
+                  <button
+                    onClick={() => {
+                      const side = document.getElementById('cust-side').value;
+                      const notes = document.getElementById('cust-notes').value;
+                      addToCart(customizingDish, { sideSwap: side, notes });
+                      setCustomizingDish(null);
+                    }}
+                    className="px-5 py-2 bg-[#E52421] text-white text-xs font-extrabold rounded-lg uppercase"
+                  >
+                    Adicionar
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* CART DRAWER */}
+          {isCartOpen && (
+            <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex justify-end">
+              <div className="w-full max-w-md bg-[#0f0f0f] border-l border-gray-800 h-full flex flex-col p-6 space-y-4 overflow-y-auto">
+                <div className="flex items-center justify-between border-b border-gray-800 pb-3">
+                  <h3 className="text-lg font-bold text-white font-heading">Sua Encomenda</h3>
+                  <button onClick={() => setIsCartOpen(false)} className="text-gray-400 hover:text-white">✕</button>
+                </div>
+
+                <div className="bg-[#E52421]/20 border border-[#E52421]/40 p-2.5 rounded-lg text-xs text-red-200 font-bold">
+                  🚚 Entregamos apenas no Kilamba e KK (Centralidade Kilamba & KK 5000)
+                </div>
+
+                {cartItems.length > 0 ? (
+                  <>
+                    <div className="space-y-3 flex-1">
+                      {cartItems.map((item) => (
+                        <div key={item.cartItemId} className="bg-[#161616] p-3 rounded-xl border border-gray-800 flex justify-between items-center text-xs">
+                          <div>
+                            <span className="font-bold text-white block">{item.name} (x{item.quantity})</span>
+                            <span className="text-[#FBC02D] font-bold">{(item.unitPrice * item.quantity).toLocaleString('pt-AO')} Kz</span>
+                            {item.customization?.sideSwap && <span className="block text-gray-400 text-[10px]">🔄 {item.customization.sideSwap}</span>}
+                            {item.customization?.notes && <span className="block text-gray-400 text-[10px]">💬 "{item.customization.notes}"</span>}
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <button onClick={() => updateQty(item.cartItemId, -1)} className="w-6 h-6 bg-gray-800 text-white rounded font-bold">-</button>
+                            <span className="px-1 text-white font-bold">{item.quantity}</span>
+                            <button onClick={() => updateQty(item.cartItemId, 1)} className="w-6 h-6 bg-gray-800 text-white rounded font-bold">+</button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="space-y-3 bg-[#161616] p-4 rounded-xl border border-gray-800 text-xs">
+                      <h4 className="font-bold text-[#FBC02D] uppercase">Dados de Entrega no Kilamba/KK</h4>
+                      <input type="text" value={customerInfo.name} onChange={e => setCustomerInfo({...customerInfo, name: e.target.value})} placeholder="Nome Completo *" className="w-full bg-black border border-gray-800 p-2 rounded text-white" />
+                      <input type="tel" value={customerInfo.phone} onChange={e => setCustomerInfo({...customerInfo, phone: e.target.value})} placeholder="Telefone WhatsApp *" className="w-full bg-black border border-gray-800 p-2 rounded text-white" />
+                      <input type="text" value={customerInfo.address} onChange={e => setCustomerInfo({...customerInfo, address: e.target.value})} placeholder="Endereço no Kilamba/KK (Bloco, Edifício, Apt) *" className="w-full bg-black border border-gray-800 p-2 rounded text-white" />
+                    </div>
+
+                    <div className="pt-3 border-t border-gray-800 space-y-3">
+                      <div className="flex justify-between font-bold text-sm">
+                        <span>Total:</span>
+                        <span className="text-[#FBC02D] text-lg">{cartSubtotal.toLocaleString('pt-AO')} Kz</span>
+                      </div>
+                      <button onClick={checkoutWhatsApp} className="w-full py-3 bg.emerald-600 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase rounded-xl shadow">
+                        Finalizar Encomenda no WhatsApp
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-xs text-gray-500 text-center py-10">Carrinho vazio.</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ADMIN MODAL */}
+          {isAdminOpen && (
+            <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="bg-[#121212] border border-gray-800 rounded-2xl max-w-2xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+                <div className="flex justify-between items-center border-b border-gray-800 pb-3">
+                  <h3 className="text-lg font-bold text-white font-heading">Painel Administrativo - República do Sabor</h3>
+                  <button onClick={() => setIsAdminOpen(false)} className="text-gray-400 hover:text-white">✕</button>
+                </div>
+
+                {!isAdminAuth ? (
+                  <form onSubmit={handleAdminLogin} className="space-y-3 max-w-xs mx-auto py-6">
+                    <p className="text-xs text-gray-400 text-center">Autenticação de Direção</p>
+                    <input type="text" value={adminUser} onChange={e => setAdminUser(e.target.value)} placeholder="Utilizador (admin)" className="w-full bg-[#1a1a1a] border border-gray-800 p-2 rounded text-xs text-white" />
+                    <input type="password" value={adminPass} onChange={e => setAdminPass(e.target.value)} placeholder="Palavra-passe (sabor2026)" className="w-full bg-[#1a1a1a] border border-gray-800 p-2 rounded text-xs text-white" />
+                    {adminError && <p className="text-[11px] text-red-400">{adminError}</p>}
+                    <button type="submit" className="w-full py-2.5 bg-[#E52421] text-white text-xs font-bold uppercase rounded-lg">Entrar</button>
+                  </form>
+                ) : (
+                  <form onSubmit={handleSaveDish} className="space-y-3 text-xs">
+                    <h4 className="font-bold text-[#FBC02D] text-sm">{editingDishId ? 'Editar Prato' : 'Adicionar Novo Prato ao Menu'}</h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      <input type="text" value={dishForm.name} onChange={e => setDishForm({...dishForm, name: e.target.value})} placeholder="Nome do Prato *" className="bg-[#1a1a1a] border border-gray-800 p-2 rounded text-white" required />
+                      <select value={dishForm.categoryId} onChange={e => setDishForm({...dishForm, categoryId: e.target.value})} className="bg-[#1a1a1a] border border-gray-800 p-2 rounded text-white">
+                        {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                      </select>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <input type="number" value={dishForm.price} onChange={e => setDishForm({...dishForm, price: e.target.value})} placeholder="Preço (Kz) *" className="bg-[#1a1a1a] border border-gray-800 p-2 rounded text-white" required />
+                      <input type="text" value={dishForm.badge} onChange={e => setDishForm({...dishForm, badge: e.target.value})} placeholder="Badge Destaque (ex: Promoção)" className="bg-[#1a1a1a] border border-gray-800 p-2 rounded text-white" />
+                    </div>
+                    <input type="url" value={dishForm.image} onChange={e => setDishForm({...dishForm, image: e.target.value})} placeholder="URL da Imagem *" className="w-full bg-[#1a1a1a] border border-gray-800 p-2 rounded text-white" required />
+                    <textarea value={dishForm.description} onChange={e => setDishForm({...dishForm, description: e.target.value})} placeholder="Descrição do Prato" rows="2" className="w-full bg-[#1a1a1a] border border-gray-800 p-2 rounded text-white" />
+                    <div className="flex justify-end gap-2 pt-2">
+                      <button type="submit" className="px-6 py-2 bg-[#E52421] text-white font-bold rounded-lg uppercase">Guardar no Website</button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
